@@ -33,9 +33,7 @@ architecture mult_4_arch of mult_4 is
     s_o : out std_logic_vector(n_g - 1 downto 0)
   );
   end component;
-
-  component subber_gen
-
+  
 begin
   
   -- extended a_i signal
