@@ -1,24 +1,61 @@
+#
+##
+##
+set command_log_file		"./synth/command.log"
+set view_command_log_file	"./synth/view_command.log"
+set designer  			"SAMI DAHOUX"
+set company  			"ensmse cmp-gc"
+
+##
+##
+#/* Owner: austriamicrosystems AG  HIT-Kit: Digital */
+set AMS_DIR "/soft/AMS_400_CDS"
+set SYNOPSYS "/soft/SYNOPSYS/INSTALL/synthesis"
+set search_path	 [list "." "$AMS_DIR/synopsys/c35_3.3V" "$SYNOPSYS/libraries/syn" "$SYNOPSYS/dw/sim_ver"]
+
+set symbol_library [list c35_CORELIB.sdb c35_IOLIB_4M.sdb c35_IOLIBV5_4M.sdb]
+set target_library [list c35_CORELIB.db c35_IOLIB_4M.db c35_IOLIBV5_4M.db]
+
+
+set synthetic_library [list standard.sldb dw_foundation.sldb dft_lbist.sldb dft_mbist.sldb]
+set link_library [concat "*" $target_library $synthetic_library]
+
+#definition des chemins pour bibliotheque de compilation a la sytnthese
+
+define_design_lib lib_synth -path ./synth/lib/lib_synth
+define_design_lib lib_rtl -path ./synth/lib/lib_rtl
+
+set verilogout_equation	 		"false"
+set verilogout_no_tri	 		"true" 
+set write_name_nets_same_as_ports	"true"
+set verilogout_single_bit		"false"
+set hdlout_internal_busses		"true"
+#set bus_inference_style			"%s[%d]"
+set sdfout_no_edge			"true"
+echo "Please use: set_fix_multiple_port_nets -all"
+set high_fanout_net_threshold "6000"
+
+
 #if not aldready defined
-set PROJECT_ROOT "../.."
+set PROJECT_ROOT ".."
 set SYNTH_DIR "$PROJECT_ROOT/synth"
 set RTL_DIR "$PROJECT_ROOT/src/rtl"
 set GATES_DIR "$PROJECT_ROOT/src/gates"
 set TOP_NAME "full_adder"
-set MODULE_DIR "adder"
 #set clock_name "clock_i"
 
 #liste des fichiers � analyser dans l'ordre
 
 
 set rtl_list [ list \
-		   $RTL_DIR/adder/half_adder.vhd\
-		   $RTL_DIR/$MODULE_DIR/full_adder.vhd\
+		   $RTL_DIR/half_adder.vhd\
+		   $RTL_DIR/full_adder.vhd\
 		  ]
 #analyse des fichiers
 analyze -library lib_rtl  -format vhdl $rtl_list
 
 #elaboration des fichiers analys�es
-elaborate $MODULE_DIR/$TOP_NAME -architecture ${TOP_NAME}_arch -library lib_rtl
+elaborate $TOP_NAME -architecture ${TOP_NAME}_arch -library lib_rtl
 
 #sauvegarde apr�s analyse et elaboration
 write -format ddc -hierarchy -output $SYNTH_DIR/ddc/${TOP_NAME}_elab.ddc
